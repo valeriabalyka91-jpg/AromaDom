@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Материалы — Арома Дом</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header class="site-header">
+<a class="brand" href="{{ url_for('index') }}">
+<span class="brand-mark">✦</span>
+<span>
+<strong>АРОМА ДОМ</strong>
+<small>Система учёта материалов</small>
+</span>
+</a>
+<span class="header-caption">ПРОИЗВОДСТВО СВЕЧЕЙ</span>
+</header>
+
+<main class="container">
+<section class="page-intro">
+<span class="eyebrow">СКЛАД И ПРОИЗВОДСТВО</span>
+<h1>Материалы</h1>
+<p>Контроль запасов сырья для изготовления декоративных свечей.</p>
+
+<div class="summary-grid">
+<div class="summary-card">
+<span>Всего материалов</span>
+<strong>{{ materials|length }}</strong>
+</div>
+<div class="summary-card">
+<span>Ниже минимального запаса</span>
+<strong>{{ shortage_count }}</strong>
+</div>
+</div>
+
+<a class="button button-primary add-button"
+href="{{ url_for('add_material') }}">
++ Добавить материал
+</a>
+</section>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<section class="messages" aria-live="polite">
+{% for category, message in messages %}
+<div class="message message-{{ category }}" role="status">
+{{ message }}
+</div>
+{% endfor %}
+</section>
+{% endif %}
+{% endwith %}
+
+{% if error %}
+<section class="empty-state">
+<h2>Не удалось загрузить материалы</h2>
+<p>{{ error }}</p>
+</section>
+{% elif not materials %}
+<section class="empty-state">
+<h2>Материалов пока нет</h2>
+<p>Добавьте первую запись с помощью кнопки выше.</p>
+</section>
+{% else %}
+<section class="materials-grid">
+{% for material in materials %}
+<article class="material-card">
+    <div class="card-heading">
+        <span class="material-type">{{ material.MaterialType }}</span>
+        <span class="material-number">№ {{ material.MaterialId }}</span>
+    </div>
+
+    <h2>{{ material.MaterialName }}</h2>
+
+    <div class="stock-grid">
+        <div class="stock-item">
+            <span>Количество на складе</span>
+            <strong>{{ material.StockQuantity }} {{ material.UnitSymbol }}</strong>
+        </div>
+        <div class="stock-item">
+            <span>Минимальное количество</span>
+            <strong>{{ material.MinimumQuantity }} {{ material.UnitSymbol }}</strong>
+        </div>
+    </div>
+
+    <div class="detail-row">
+        <span>Цена за единицу</span>
+        <strong>{{ "%.2f"|format(material.UnitPrice) }} ₽ / {{ material.UnitSymbol }}</strong>
+    </div>
+
+    <div class="detail-row">
+        <span>Количество в упаковке</span>
+        <strong>{{ material.PackageQuantity }} {{ material.UnitSymbol }}</strong>
+    </div>
+
+    <div class="required-panel">
+        <span>Требуемое количество</span>
+        <strong>{{ "%.2f"|format(material.RequiredQuantity) }} {{ material.UnitSymbol }}</strong>
+    </div>
+
+    {% if material.StockQuantity < material.MinimumQuantity %}
+        <div class="stock-warning">
+            Остаток ниже минимального запаса
+        </div>
+    {% endif %}
+
+    <div class="card-actions">
+        <a class="button button-secondary"
+           href="{{ url_for('edit_material', material_id=material.MaterialId) }}">
+            Редактировать
+        </a>
+
+        <a class="button button-primary"
+           href="{{ url_for('products_by_material', material_id=material.MaterialId) }}">
+            Продукция по материалу
+        </a>
+    </div>
+</article>
+{% endfor %}
+</section>
+{% endif %}
+</main>
+
+<footer class="site-footer">
+Арома Дом · Система учёта материалов
+</footer>
+</body>
+</html>

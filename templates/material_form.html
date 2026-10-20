@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% if is_edit %}Редактирование материала{% else %}Добавление материала{% endif %} — Арома Дом</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header class="site-header">
+<a class="brand" href="{{ url_for('index') }}">
+<span class="brand-mark">✦</span>
+<span>
+<strong>АРОМА ДОМ</strong>
+<small>Система учёта материалов</small>
+</span>
+</a>
+<span class="header-caption">КАРТОЧКА МАТЕРИАЛА</span>
+</header>
+
+<main class="container form-container">
+<a class="back-link" href="{{ url_for('index') }}">
+← Назад к списку материалов
+</a>
+
+<section class="page-intro form-intro">
+<span class="eyebrow">УПРАВЛЕНИЕ СКЛАДОМ</span>
+<h1>
+{% if is_edit %}
+Редактирование материала
+{% else %}
+Добавление материала
+{% endif %}
+</h1>
+<p>Заполните поля формы. Все поля обязательны.</p>
+</section>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<section class="messages" aria-live="polite">
+{% for category, message in messages %}
+<div class="message message-{{ category }}" role="alert">
+{{ message }}
+</div>
+{% endfor %}
+</section>
+{% endif %}
+{% endwith %}
+
+<form class="material-form" method="POST">
+<div class="form-grid">
+<div class="form-field">
+<label for="material_type_id">Тип материала *</label>
+<select id="material_type_id" name="material_type_id" required>
+<option value="">Выберите тип материала</option>
+{% for item in material_types %}
+<option value="{{ item.id }}"
+{% if (form_data.get('material_type_id', material.MaterialTypeId|string if material else '')|string) == (item.id|string) %}selected{% endif %}>
+{{ item.name }}
+</option>
+{% endfor %}
+</select>
+</div>
+
+<div class="form-field">
+<label for="material_name">Наименование материала *</label>
+<input id="material_name"
+name="material_name"
+type="text"
+maxlength="250"
+required
+placeholder="Например, Соевый воск премиум"
+value="{{ form_data.get('material_name', material.MaterialName if material else '') }}">
+</div>
+
+<div class="form-field">
+<label for="unit_price">Цена за единицу, ₽ *</label>
+<input id="unit_price"
+name="unit_price"
+type="number"
+min="0"
+step="0.01"
+required
+placeholder="890.00"
+value="{{ form_data.get('unit_price', material.UnitPrice if material else '') }}">
+<small>Неотрицательное число, не более двух знаков после запятой.</small>
+</div>
+
+<div class="form-field">
+<label for="unit_id">Единица измерения *</label>
+<select id="unit_id" name="unit_id" required>
+<option value="">Выберите единицу измерения</option>
+{% for item in units %}
+<option value="{{ item.id }}"
+{% if (form_data.get('unit_id', material.UnitId|string if material else '')|string) == (item.id|string) %}selected{% endif %}>
+{{ item.symbol }} — {{ item.name }}
+</option>
+{% endfor %}
+</select>
+</div>
+
+<div class="form-field">
+<label for="package_quantity">Количество в упаковке *</label>
+<input id="package_quantity"
+name="package_quantity"
+type="number"
+min="0.001"
+step="0.001"
+required
+value="{{ form_data.get('package_quantity', material.PackageQuantity if material else '') }}">
+<small>Должно быть больше нуля.</small>
+</div>
+
+<div class="form-field">
+<label for="stock_quantity">Количество на складе *</label>
+<input id="stock_quantity"
+name="stock_quantity"
+type="number"
+min="0"
+step="0.001"
+required
+value="{{ form_data.get('stock_quantity', material.StockQuantity if material else '0') }}">
+</div>
+
+<div class="form-field">
+<label for="minimum_quantity">Минимальное количество *</label>
+<input id="minimum_quantity"
+name="minimum_quantity"
+type="number"
+min="0"
+step="0.001"
+required
+value="{{ form_data.get('minimum_quantity', material.MinimumQuantity if material else '0') }}">
+</div>
+</div>
+
+<div class="form-actions">
+<button class="button button-primary" type="submit">
+{% if is_edit %}Сохранить изменения{% else %}Добавить материал{% endif %}
+</button>
+<a class="button button-secondary" href="{{ url_for('index') }}">
+Отмена
+</a>
+</div>
+</form>
+</main>
+
+<footer class="site-footer">
+Арома Дом · Система учёта материалов
+</footer>
+</body>
+</html>

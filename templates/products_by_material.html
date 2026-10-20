@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Продукция из материала — Арома Дом</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header class="site-header">
+        <a class="brand" href="{{ url_for('index') }}">
+            <span class="brand-mark">✦</span>
+            <span>
+                <strong>АРОМА ДОМ</strong>
+                <small>Система учёта материалов</small>
+            </span>
+        </a>
+        <span class="header-caption">РЕЦЕПТУРЫ ПРОДУКЦИИ</span>
+    </header>
+
+    <main class="container">
+        <a class="back-link" href="{{ url_for('index') }}">
+            ← Назад к материалам
+        </a>
+
+        <section class="page-intro">
+            <span class="eyebrow">МАТЕРИАЛ № {{ material.MaterialId }}</span>
+            <h1>Использование материала</h1>
+            <p>
+                Материал:
+                <strong>{{ material.MaterialName }}</strong>
+            </p>
+            <p>
+                Ниже приведена продукция, в рецептуре которой используется
+                этот материал, и расход сырья на одну единицу продукции.
+            </p>
+        </section>
+
+        {% if products %}
+            <div class="products-table-wrapper">
+                <table class="products-table">
+                    <thead>
+                        <tr>
+                            <th>Артикул</th>
+                            <th>Наименование продукции</th>
+                            <th>Тип продукции</th>
+                            <th>Количество материала на изделие</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in products %}
+                            <tr>
+                                <td>{{ product.Article }}</td>
+                                <td>{{ product.ProductName }}</td>
+                                <td>{{ product.ProductType }}</td>
+                                <td>
+                                    {{ product.RequiredQuantity }}
+                                    {{ material.UnitSymbol }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <section class="empty-state">
+                <h2>Продукция не найдена</h2>
+                <p>
+                    В текущей базе данных нет активной продукции,
+                    использующей этот материал в рецептуре.
+                </p>
+            </section>
+        {% endif %}
+
+        <div class="page-actions">
+            <a class="button button-secondary" href="{{ url_for('index') }}">
+                Вернуться к списку материалов
+            </a>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        Арома Дом · Система учёта материалов
+    </footer>
+</body>
+</html>
